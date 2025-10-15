@@ -275,7 +275,6 @@ def get_accounts():
     
     return df
 
-
 def main():
     snapeda = SnapEDA()
     console = snapeda.console
@@ -290,11 +289,10 @@ def main():
         part['pdf_link'] = pdf_link
         new_parts.append(part)
         print(part)
-        
         print(f'Part {idx} of {len(parts)}')
+        # Save after each iteration
+        pd.DataFrame(new_parts).to_csv('new_parts.csv', index=False)
         # break
-    new_df = pd.DataFrame(new_parts)
-    new_df.to_excel('new_parts.xlsx', index=False)
 
 def create_cookie():
     accounts = get_accounts()
