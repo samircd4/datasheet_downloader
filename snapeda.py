@@ -136,7 +136,18 @@ class SnapEDA:
         cookies = get_random_cookie()
         self.pw.new_context(storage_state=cookies)
         page = self.pw.page
-        page.goto(f'https://www.snapeda.com/parts/{part_number}/{manufacturer}/view-part/', timeout=90000)
+        url = f'https://www.snapeda.com/parts/{part_number.replace('#','%23')}/{manufacturer}/view-part/'
+        print(url)
+        page.goto(url, timeout=90000)
+        
+        not_found = page.locator('div#view-part-content h1')
+        if not_found.is_visible():
+            not_found = not_found.inner_text()
+            if 'Oh snap' in not_found:
+                print(f'Part Not Found: {part_number}')
+                self.pw.stop()
+                return '', 'not found'
+        
         package_name = page.locator('span.package_name')
         if package_name.is_visible():
             package_name = package_name.inner_text()
@@ -147,8 +158,10 @@ class SnapEDA:
             datasheet_link = datasheet_link.get_attribute('href')
         else:
             datasheet_link = ''
+        
         pdf_link = ''
         page.goto(f'https://www.snapeda.com{datasheet_link}', timeout=90000)
+        
         pdf_link = page.locator('object.me-iframe')
         if pdf_link.is_visible():
             pdf_link = pdf_link.get_attribute('data')
@@ -284,6 +297,8 @@ def main():
     for idx, part in enumerate(parts[:1001], 1):
         part_name = part['part_name']
         manufacturer = part['supplier']
+        if part_name != 'AT-1220-TT-R':
+            continue
         package_name, pdf_link = snapeda.get_details(manufacturer, part_name)
         part['package_name'] = package_name
         part['pdf_link'] = pdf_link
