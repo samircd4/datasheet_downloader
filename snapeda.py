@@ -291,14 +291,14 @@ def get_accounts():
 def main():
     snapeda = SnapEDA()
     console = snapeda.console
-    df = pd.read_csv('all_parts.csv')
+    df = pd.read_csv('sample.csv')
     parts = df.to_dict(orient='records')
     new_parts = []
-    for idx, part in enumerate(parts[:1001], 1):
+    for idx, part in enumerate(parts, 1):
         part_name = part['part_name']
         manufacturer = part['supplier']
-        if part_name != 'AT-1220-TT-R':
-            continue
+        # if part_name != 'AT-1220-TT-R':
+        #     continue
         package_name, pdf_link = snapeda.get_details(manufacturer, part_name)
         part['package_name'] = package_name
         part['pdf_link'] = pdf_link
